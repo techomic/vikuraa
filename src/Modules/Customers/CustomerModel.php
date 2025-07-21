@@ -2,6 +2,8 @@
 
 namespace Vikuraa\Modules\Customers;
 
+use RuntimeException;
+use PDOException;
 use Vikuraa\Core\Model;
 use Vikuraa\Exceptions\NoDataException;
 use Vikuraa\Modules\People\PersonModel;
@@ -157,23 +159,17 @@ class CustomerModel extends Model
 
     public function byIds(array $ids) : Customers
     {
-        $sql = "select * from customer_person where person_id in ";
-
-        $args = [];
-        for ($i = 0; $i < count($ids); $i++) {
-            if ($i == 0) {
-                $sql .= ":id_{$i}";
-            } else {
-                $sql .= ", :id_{$i}";
-            }
-            $args["id_{$i}"] = $ids[$i];
+        if (empty($ids)) {
+            throw new RuntimeException('$ids array is empty');
         }
 
-        $sql .= " ) and deleted = false";
+        $placeholders = implode(', ', array_fill(0, count($ids), '?'));
 
-        $data = $this->db->query($sql, $args);
+        $sql = "select * from customer_person where person_id in ({$placeholders}) AND deleted = FALSE;";
 
-        if (!is_array($data)) {
+        $data = $this->db->query($sql, $ids);
+
+        if (empty($data)) {
             throw new NoDataException('No customers found');
         }
 
