@@ -8,6 +8,7 @@ use Vikuraa\Exceptions\ConnectionException;
 use Psr\Log\LoggerInterface;
 use Vikuraa\Exceptions\DatabaseException;
 use Exception;
+use InvalidArgumentException;
 
 class Db
 {
@@ -56,14 +57,17 @@ class Db
 
     /**
      * Checks if the PDO connection is active.
-     * NOTE: PDO::ATTR_CONNECTION_STATUS is deprecated in PHP 8.0+.
-     * A more robust check might involve a simple dummy query (e.g., SELECT 1).
-     * @todo change according to above note
      * @return bool
      */
     public function connected(): bool
     {
-        return $this->pdo->getAttribute(PDO::ATTR_CONNECTION_STATUS) !== null;
+        $sql = 'select 1';
+        try {
+            $this->pdo->query($sql);
+            return true;
+        } catch (PDOException $e) {
+            return false;
+        }
     }
 
     /**
@@ -96,13 +100,6 @@ class Db
     /**
      * Executes a DML (INSERT, UPDATE, DELETE) query.
      *
-     * NOTE: There's a logical flow issue here. If $params is empty, it calls exec(),
-     * but then immediately proceeds to prepare/execute, which is redundant
-     * and incorrect for non-parameterized DML.
-     * It should either use exec() OR prepare/execute, not both paths in sequence.
-     * Also, $this->stmt is not set if exec() is used.
-     *
-     * @todo improve according to above note
      * @param string $query The SQL query string.
      * @param array $params An array of parameters for prepared statements.
      * @param bool $needInsertId Whether to return the last insert ID.
@@ -115,9 +112,10 @@ class Db
         try {
             if (count($params) === 0) {
                 $result = $this->pdo->exec($query);
+            } else {
+                $this->stmt = $this->pdo->prepare($query);
+                $result = $this->stmt->execute($params);
             }
-            $this->stmt = $this->pdo->prepare($query);
-            $result = $this->stmt->execute($params);
 
             if (strpos(strtoupper($query), 'INSERT') === 0 && $needInsertId) {
                 return $this->pdo->lastInsertId();
@@ -134,28 +132,29 @@ class Db
     /**
      * Executes a query and returns the row count.
      *
-     * NOTE: PDOStatement::rowCount() is generally unreliable for SELECT statements
-     * as it often returns 0 or -1 depending on the driver.
-     * For SELECT queries, use COUNT(*) in your SQL or fetchAll() and then count the array.
-     * This method is best suited for DML (INSERT, UPDATE, DELETE) operations.
-     *
-     * @todo change to a select count(*)
-     * @param string $query The SQL query string.
+     * @param string $query An sql select query.
      * @param array $params An array of parameters for prepared statements.
      * @return int The number of rows affected by a DML query, or potentially unreliable for SELECT.
      * @throws DatabaseException If the database query fails.
      * @throws Exception For any other unexpected errors.
+     * @throws InvalidArgumentException if $query is not a select statement.
      */
     public function count(string $query, array $params = []): int
     {
+        if (strpos(strtolower(trim($query)), 'select') === false) {
+            throw new InvalidArgumentException('Query must be a select statement');
+        }
+
+        $sql = "select count(*) as cnt from ({$query})";
         try {
             $this->stmt = $this->pdo->prepare($query);
             if (count($params) > 0) {
                 $this->stmt->execute($params);
-                return $this->stmt->rowCount();
+                $data = $this->stmt->fetchAll();
+                return $data[0]['cnt'];
             }
-            $this->stmt->execute();
-            return $this->stmt->rowCount();
+            $data = $this->stmt->fetchAll();
+            return $data[0]['cnt'];
         } catch (PDOException $e) {
             throw new DatabaseException('Database query failed: ' . $e->getMessage(), $e->getCode());
         } catch (Exception $e) {
