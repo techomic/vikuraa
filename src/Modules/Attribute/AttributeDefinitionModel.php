@@ -153,6 +153,9 @@ class AttributeDefinitionModel extends Model
 		return $attributeDefinitions;
 	}
 
+	/**
+	 * @todo improve. Refer to Customer::byIds
+	 */
 	public function byIds(array $ids) : AttributeDefinitions
 	{
 		$sql = "select * from attribute_definitions where id in ((";
@@ -230,5 +233,20 @@ class AttributeDefinitionModel extends Model
 		$definitions->addAllFromDbArray($data);
 
 		return $definitions;		
+	}
+
+	/**
+	 * @todo complete this method
+	 */
+	public function save(AttributeDefinition $definition) : int|false
+	{
+		// save if new
+		// update if exists
+		return false;
+	}
+
+	public function byName(string $name, ?string $type = null) : AttributeDefinition
+	{
+		return AttributeDefinition::fromArray([]);
 	}
 }

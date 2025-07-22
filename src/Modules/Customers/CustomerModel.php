@@ -301,7 +301,7 @@ class CustomerModel extends Model
 
         $data = $this->db->query($sql, $args);
 
-        if (is_array($data) && count($data) > 0) {
+        if (!empty($data)) {
             foreach ($data as $row) {
                 $customers->add(Customer::fromDbArray($row));
             }
@@ -309,7 +309,6 @@ class CustomerModel extends Model
             throw new NoDataException('No customers found');
         }
         
-
         return $customers;
     }
 

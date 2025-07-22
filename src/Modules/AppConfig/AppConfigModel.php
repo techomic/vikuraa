@@ -173,4 +173,14 @@ class AppConfigModel extends Model
 
         return $next;
     }
+
+    /**
+     * Saves a batch of AppConfigs.
+     * 
+     * @todo for multiple rows, call $this->save
+     */
+    public function batchSave($data) : int|false
+    {
+        return false;
+    }
 }

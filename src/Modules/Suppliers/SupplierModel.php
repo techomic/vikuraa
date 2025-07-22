@@ -8,6 +8,15 @@ use Vikuraa\Helpers\Functions;
 
 class SupplierModel extends Model
 {
+    /**
+     * Checks if a supplier exists or not.
+     */
+    public function exists(int $id) : bool
+    {
+        $sql = "select id person_id from suppliers where person_id = ? and deleted = false";
+        return $this->db->count($sql, [$id]) > 0;
+    }
+
     public function byId(int $id): Supplier
     {
         $sql = "select * from suppliers where person_id = :supplier_id and deleted = false";
@@ -48,6 +57,9 @@ class SupplierModel extends Model
         return $suppliers;
     }
 
+    /**
+     * @todo refer to Customer::byIds and improve this method
+     */
     public function byIds(array $ids): Suppliers
     {
         $sql = "select * from suppliers_people where deleted = false and person_id in (";
@@ -113,5 +125,27 @@ class SupplierModel extends Model
         $suppliers = new Suppliers();
         $suppliers->addAllFromDbArray($data);
         return $suppliers;
+    }
+
+    /**
+     * @todo implement save functionality.
+     */
+    public function save(Supplier $supplier) : int|false
+    {
+        // first save to person table
+        // then to supplier table
+        // refer Customer::save
+        return false;
+    }
+
+    /**
+     * Delete a supplier.
+     * 
+     * @todo implement delete functionality.
+     */
+    public function delete(int $id) : bool
+    {
+        // update set deleted = true
+        return false;
     }
 }
