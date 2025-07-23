@@ -163,9 +163,9 @@ class CustomerModel extends Model
             throw new RuntimeException('$ids array is empty');
         }
 
-        $placeholders = implode(', ', array_fill(0, count($ids), '?'));
+        $placeHolders = implode(', ', array_fill(0, count($ids), '?'));
 
-        $sql = "select * from customer_person where person_id in ({$placeholders}) AND deleted = FALSE;";
+        $sql = "select * from customer_person where person_id in ({$placeHolders}) AND deleted = FALSE;";
 
         $data = $this->db->query($sql, $ids);
 

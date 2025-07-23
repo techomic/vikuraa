@@ -13,17 +13,15 @@ class AppConfigs extends Collection
 
     public function getValue($key): mixed
     {
-        $found = false;
+        $value = null;
         foreach ($this->items as $appConfig) {
             if ($appConfig->key === $key) {
-                $found = true;
-                return $appConfig->value;
+                $value = $appConfig->value;
+                break;
             }
         }
 
-        if (!$found) {
-            return null;
-        }
+        return $value;
     }
 
     public function addAll(array $items) : void
