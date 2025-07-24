@@ -3,22 +3,23 @@
 namespace Vikuraa\Modules\Customers;
 
 use Vikuraa\Modules\People\Person;
+use DateTime;
 
 class Customer extends Person
 {
-    protected $companyName;
-    protected $accountNumber;
-    protected $taxable;
-    protected $taxId;
-    protected $salesTaxCodeId;
-    protected $discount;
-    protected $discountType;
-    protected $packageId;
-    protected $points;
-    protected $deleted;
-    protected $date;
-    protected $employeeId;
-    protected $consent;
+    protected ?string $companyName;
+    protected ?string $accountNumber;
+    protected ?bool $taxable;
+    protected ?string $taxId;
+    protected ?int $salesTaxCodeId;
+    protected ?float $discount;
+    protected ?string $discountType;
+    protected ?int $packageId;
+    protected ?int $points;
+    protected ?bool $deleted;
+    protected ?DateTime $date;
+    protected ?int $employeeId;
+    protected ?bool $consent;
 
     public static function fromDbArray(array $data): static
     {
@@ -34,7 +35,7 @@ class Customer extends Person
         $customer->packageId = $data['package_id'];
         $customer->points = $data['points'];
         $customer->deleted = $data['deleted'];
-        $customer->date = $data['date'];
+        $customer->date = $data['date'] == null ? null : new DateTime($data['date']);
         $customer->employeeId = $data['employee_id'];
         $customer->consent = $data['consent'];
 

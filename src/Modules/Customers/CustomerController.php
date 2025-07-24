@@ -68,16 +68,38 @@ class CustomerController extends Controller
     {
         $body = $request->getParsedBody();
 
-        if (empty($body['first_name']) || empty($body['last_name']) || empty($body['consent'])) {
+        if (empty($body['first_name']) || empty($body['last_name']) || $body['consent'] === null) {
             throw new HttpBadRequestException($request, 'First name, last name and consent are required');
         }
 
         $body['person_id'] = 0;
-        $customer = Customer::fromDbArray($body);
+        $customer = Customer::fromDbArray([
+            'person_id'         => $body['person_id'],
+            'account_number'    => $body['account_number'],
+            'address_1'         => $body['address_1'],
+            'address_2'         => $body['address_2'],
+            'city'              => $body['city'],
+            'comments'          => empty($body['comments']) ? '-' : $body['comments'],
+            'company'           => $body['company'],
+            'consent'           => boolval($body['consent']),
+            'country'           => $body['country'],
+            'discount'          => floatval($body['discount']),
+            'discount_type'     => $body['discount_type'],
+            'email'             => $body['email'],
+            'first_name'        => $body['first_name'],
+            'gender'            => $body['gender'],
+            'last_name'         => $body['last_name'],
+            'phone_number'      => $body['phone_number'],
+            'state'             => $body['state'],
+            'tax_id'            => $body['tax_id'],
+            'taxable'           => boolval($body['taxable']),
+            'zip'               => $body['zip']
+        ]);
+        $this->logger->debug('saving customer', $customer->toArray());
 
         $model = new CustomerModel($this->container);
-
-        if ($model->save($customer)) {
+        $result = $model->save($customer);
+        if ($result) {
             return $response->withJson([
                 'status' => 'success',
                 'message' => 'Customer saved successfully'
