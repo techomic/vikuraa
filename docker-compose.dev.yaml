@@ -11,6 +11,8 @@ services:
       - vikuraa-postgres
       - vikuraa-valkey
     restart: always
+    environment:
+      TZ: Asia/Karachi
 
   vikuraa-nginx:
     image: nginx:1.24-alpine
@@ -32,6 +34,7 @@ services:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: vikuraa
+      TZ: Asia/Karachi
     volumes:
       - ./db/data:/var/lib/postgresql/data
     restart: always

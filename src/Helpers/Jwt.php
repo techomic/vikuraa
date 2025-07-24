@@ -68,7 +68,7 @@ class Jwt
     public function getUserData(Request $request)
     {
         $token =  $this->getToken($request);
-        return json_decode($this->decode($token));
+        return $this->decode($token);
     }
 
     public function timestamp($token)

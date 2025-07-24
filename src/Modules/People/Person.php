@@ -7,7 +7,7 @@ use Vikuraa\Core\Entity;
 
 class Person extends Entity
 {
-    protected int $personId;
+    protected ?int $personId;
     protected string $firstName;
     protected string $lastName;
     protected ?string $gender;

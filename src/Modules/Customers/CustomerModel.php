@@ -3,7 +3,6 @@
 namespace Vikuraa\Modules\Customers;
 
 use RuntimeException;
-use PDOException;
 use Vikuraa\Core\Model;
 use Vikuraa\Exceptions\NoDataException;
 use Vikuraa\Modules\People\PersonModel;
@@ -57,11 +56,13 @@ class CustomerModel extends Model
             'consent' => $customer->consent,
         ];
 
-        if ($args['person_id'] = (new PersonModel($this->container))->save($customer)) {
-            return $this->db->execute($sql, $args, true);
-        }
+        return (new PersonModel($this->container))->save($customer);
+        // if ($args['person_id'] = (new PersonModel($this->container))->save($customer)) {
+        //     $this->logger->debug('personid ' . $args['person_id']);
+        //     return $this->db->execute($sql, $args, true);
+        // }
 
-        return false;
+        // return false;
     }
 
     public function exists(int $id): bool

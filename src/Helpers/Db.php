@@ -112,12 +112,14 @@ class Db
         try {
             if (count($params) === 0) {
                 $result = $this->pdo->exec($query);
+                $this->logger->debug('param count is 0');
             } else {
                 $this->stmt = $this->pdo->prepare($query);
                 $result = $this->stmt->execute($params);
+                $this->logger->debug('param count is not 00000');
             }
 
-            if (strpos(strtoupper($query), 'INSERT') === 0 && $needInsertId) {
+            if (strpos(trim(strtoupper($query)), 'INSERT') === 0 && $needInsertId) {
                 return $this->pdo->lastInsertId();
             }
 
