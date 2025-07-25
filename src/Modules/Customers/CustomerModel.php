@@ -274,13 +274,13 @@ class CustomerModel extends Model
             select *
             from customer_person
             where (
-                lower(first_name) like concat('%', cast(:query as text), '%')
-                or lower(last_name) like concat('%', cast(:query as text), '%')
-                or lower(email) like concat('%', cast(:query as text), '%')
-                or lower(phone_number) like concat('%', cast(:query as text), '%')
-                or lower(account_number) like concat('%', cast(:query as text), '%')
-                or lower(company_name) like concat('%', cast(:query as text), '%')
-                or concat(lower(first_name), ' ', lower(last_name)) like concat('%', cast(:query as text), '%')
+                first_name ilike '%' || cast(:query as text) || '%'
+                or last_name ilike '%' || cast(:query as text) || '%'
+                or email ilike '%' || cast(:query as text) || '%'
+                or phone_number ilike '%' || cast(:query as text) || '%'
+                or account_number ilike '%' || cast(:query as text) || '%'
+                or company_name ilike '%' || cast(:query as text) || '%'
+                or first_name || ' ' || last_name ilike '%' || cast(:query as text) || '%'
             ) and deleted = false
         ";
 
@@ -293,8 +293,12 @@ class CustomerModel extends Model
         $args['sort'] = $sort;
 
         if ($limit > 0) {
-            $sql .= " limit cast(:limit as int) offset cast(:offset as int) ";
+            $sql .= " limit cast(:limit as int) ";
             $args['limit'] = $limit;
+        }
+        
+        if ($offset > 0) {
+            $sql .= " offset cast(:offset as int) ";
             $args['offset'] = $offset;
         }
 

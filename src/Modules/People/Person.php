@@ -20,7 +20,7 @@ class Person extends Entity
     protected string $zip;
     protected string $country;
     protected string $comments;
-    protected DateTime $createdAt;
+    protected ?DateTime $createdAt;
 
     
 
@@ -40,7 +40,7 @@ class Person extends Entity
         $person->zip = $data['zip'];
         $person->country = $data['country'];
         $person->comments = $data['comments'];
-        $person->createdAt = new DateTime($data['created_at']);
+        $person->createdAt = $data['created_at'] == null ? null : new DateTime($data['created_at']);
         return $person;
     }
 }
