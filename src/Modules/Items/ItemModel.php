@@ -6,37 +6,27 @@ use Vikuraa\Core\Model;
 
 class ItemModel extends Model
 {
-    public function exists(int $id, bool $ignoreDeleted = false, bool $deleted = false): bool
+    public function exists(int $id): bool
     {
-        $sql = "select * from items where id = :id";
+        $sql = "select * from items where id = :id and deleted = false";
 
         $args = [
             'id' => $id
         ];
 
-        if (!$ignoreDeleted) {
-            $sql .= " and deleted = :del ";
-            $args['del'] = $deleted;
-        }
-
         return $this->db->count($sql, $args) > 0;
     }
 
-    public function itemNumberExists(string $itemNumber, string $id): bool
+    public function itemNumberExists(string $itemNumber) : bool
     {
         if (boolval($this->config->getValue('allow_duplicate_barcodes'))) {
             return false;
         }
 
-        $sql = "select * from items where item_number = :item_number deleted = false and id <> :id ";
-
-        if (ctype_digit($id) && !str_starts_with($id, '0')) {
-            $sql .= " and id <> :id ";
-		}
+        $sql = "select * from items where item_number = :item_number deleted = false";
 
         $args = [
             'item_number' => $itemNumber,
-            'id' => intval($id)
         ];
 
         return $this->db->count($sql, $args) > 0;
@@ -59,17 +49,20 @@ class ItemModel extends Model
 		return $this->db->count($sql, $args);
 	}
 
-    // public function search(
-    //     string $search,
-    //     array $filters,
-    //     int $limit = 20,
-    //     int $page = 1,
-    //     ?string $sort = 'items.name',
-    //     ?string $order = 'asc',
-    //     ?bool $countOnly = false
-    // ) : Items {
-    //     $sql = "";
-    // }
+    public function search(
+        string $search,
+        array $filters,
+        int $limit = 20,
+        int $page = 1,
+        ?string $sort = 'items.name',
+        ?string $order = 'asc'
+    ) : Items {
+        $sql = "
+            select *
+            from public.items_with_suppliers_and_inventory
+            where 
+        ";
+    }
 
     public function save(Item $item)
     {

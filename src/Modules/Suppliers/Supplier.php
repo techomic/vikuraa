@@ -6,15 +6,6 @@ use Vikuraa\Modules\People\Person;
 
 class Supplier extends Person
 {
-    /*
-    person_id => NO => integer
-    company_name => NO => character varying
-    agency_name => NO => character varying
-    account_number => YES => character varying
-    tax_id => YES => character varying
-    deleted => YES => boolean
-    category => NO => smallint
-    */
     protected string $companyName;
     protected string $agencyName;
     protected ?string $accountNumber;
